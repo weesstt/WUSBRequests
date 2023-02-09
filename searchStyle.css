@@ -256,4 +256,9 @@ button:hover {
   #SearchButton {
     margin: 0px 0px 0px 0px;
   }
+
+  .lds-ring {
+    margin-top: 100px;
+  }
+
 }

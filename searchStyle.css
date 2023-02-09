@@ -1,0 +1,259 @@
+/*
+* Blue: #04306D
+* Red: #D4001D
+* White
+* Black
+* Gray: #797878
+*/
+
+#body{
+  background-color: #04306D;
+}
+
+#WUSBLogo {
+  width: 200px;
+  height: 200px;
+}
+
+#SearchBarContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+#SearchBar {
+  width: 450px;
+  height: 60px;
+  border: none;
+  border-radius: 20px;
+  font-family: 'Circular Std', sans-serif;
+  font-size: 20px;
+  padding: 1px 20px 1px 20px;
+  background-color: white;
+  color: #797878;
+  margin: 70px 30px 70px 25px;
+}
+
+#SearchButton {
+  width: 170px;
+  height: 60px;
+  color: white;
+  background-color: #D4001D;
+  border-radius: 20px;
+  border: none;
+  font-family: 'Circular Std', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
+  text-align: center;
+  margin: 70px 0px 70px 0px;
+}
+
+#ErrorMessageContainer {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: #E03F55;
+  border: none;
+  border-radius: 20px;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  filter: brightness(85%);
+  width: 500px;
+  height: auto;
+}
+
+#ErrorMessageText {
+  font-family: 'Circular Std', sans-serif;
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  word-break: keep-all;
+  padding: 0px 10px 0px 10px;fgjs
+}
+
+#SearchResultsContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.resultContainer {
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Circular Std', sans-serif;
+  background-color: white;
+  border-radius: 20px;
+  width: 310px;
+  height: 417px;
+  padding-bottom: 20px;
+  margin: 50px 80px 30px 80px;
+}
+
+.titleInfoContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 250px;
+  padding-right: 30px;
+  padding-left: 30px;
+  font-size: 30px;
+  font-weight: bold;
+  color: black;
+}
+
+.titleInfoText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 215px;
+}
+
+.artistsInfo {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  padding-left: 30px;
+  padding-right: 30px;
+  color: #797878;
+  font-size: 17px;
+  text-align: left;
+}
+
+.requestButton {
+  font-family: 'Circular Std', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  width: 200px;
+  height: 45px;
+  background-color: #D4001D;
+  border-radius: 30px;
+  border: none;
+  color: white;
+  transition: all 0.3s;
+  margin: 15px 55px 0px 55px;
+}
+
+.requestedButton {
+  font-family: 'Circular Std', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  width: 200px;
+  height: 45px;
+  margin: 15px 55px 0px 55px;
+  background-color: white;
+  border-radius: 30px;
+  border: 3px solid #D4001D;
+  color: #D4001D;
+  transition: all 0.3s;
+}
+
+#pageSelectorContainer{
+  display: none;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 25px;
+  margin-bottom: 40px;
+}
+
+.pageSelector {
+  background-color: #D4001D;
+  color: white;
+  border-radius: 10px;
+  border: none;
+  margin-right: 8px;
+  padding: 10px;
+  font-family: 'Circular Std', sans-serif;
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  transition: 0.2s;
+}
+
+button:hover {
+  filter: brightness(85%);
+  transition: 0.2s;
+}
+
+.requestedButton:hover {
+  filter: none;
+}
+
+.pageSelector:hover {
+  filter: none;
+}
+
+.pageSelectorClickable:hover {
+  filter: brightness(85%);
+}
+
+.lds-ring {
+  display: block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: auto;
+  margin-top: 200px;
+}
+
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid #fff;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #fff transparent transparent transparent;
+}
+
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 750px){
+  #ErrorMessageContainer {
+    width: 300px;
+  }
+
+  #SearchResultsContainer {
+    margin: 0px 0px 50px 0px;
+  }
+
+  #SearchBarContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #SearchBar {
+    margin: 40px 0px 40px 0px;
+    width: 300px;
+  }
+
+  #SearchButton {
+    margin: 0px 0px 0px 0px;
+  }
+}

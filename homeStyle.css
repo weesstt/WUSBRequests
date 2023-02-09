@@ -1,0 +1,71 @@
+/*
+* Blue: #04306D
+* Red: #D4001D
+* White
+* Black
+* Gray: #797878
+*/
+
+#body {
+  background-color: #04306D;
+}
+
+#SearchBarContainer {
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+#WUSBLogo {
+  width: 300px;
+  height: 300px;
+}
+
+#SearchBar {
+  border: none;
+  border-radius: 20px;
+  font-family: 'Circular Std', sans-serif;
+  font-size: 20px;
+  padding: 1px 20px 1px 20px;
+  margin-top: 30px;
+  background-color: white;
+  color: #797878;
+  width: 500px;
+  height: 60px;
+}
+
+#SearchButton {
+  font-family: 'Circular Std', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
+  border-radius: 20px;
+  border: none;
+  margin-top: 30px;
+  height: 60px;
+  width: 170px;
+  color: white;
+  background-color: #D4001D;
+  text-align: center;
+}
+
+#SearchButton:hover {
+  filter: brightness(85%);
+  transition: 0.2s;
+}
+
+button:hover {
+  filter: brightness(85%);
+  transition: 0.2s;
+}
+
+@media only screen and (max-width: 750px){
+  #SearchBar {
+    width: 325px;
+  }
+
+  #WUSBLogo {
+    width: 250px;
+    height: 250px;
+  }
+}

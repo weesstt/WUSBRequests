@@ -238,6 +238,10 @@ function requestButtonEvent(event){
   const trackObj = results[uri];
   const songListRef = ref(database, 'songs/' + uri);
 
+  if(requestButton.classList.contains("requestedButton")){
+    return;
+  }
+
   remove(songListRef)
   .then(() => {
     set(songListRef, trackObj)

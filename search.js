@@ -139,7 +139,7 @@ async function executeSpotifySearch(){
             uri: currentTrack.uri,
             explicit: currentTrack.explicit,
             artists: artistsString,
-            timeStamp: getTimeStamp()
+            timeStamp: Date.now()
           };
           resultMap[currentTrack.uri] = trackDataObject;
         }
@@ -307,14 +307,4 @@ function displayNoResultsMessage(){
   errorMsgContainer.style.backgroundColor = "white";
   errorMsgText.style.color = "#7290CB"
   errorMsgText.innerText = "No results found! Please try a different search query.";
-}
-
-/**
-* Function takes in a date and returns a timestamp string.
-* @param {Date} date object to turn into a timestamp string.
-* @return {String} A string representing the date input in the form of yearmonthdayhourminutesseconds.
-*/
-function getTimeStamp(){
-  const date = new Date();
-  return "" + date.getFullYear() + "" + date.getMonth() + "" + date.getDate() + "" + date.getHours() + "" + date.getMinutes() + "" + date.getSeconds();
 }

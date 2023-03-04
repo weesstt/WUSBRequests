@@ -4,13 +4,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import { getDatabase, ref, push, set, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 let searchBar, searchButton, errorMsgContainer, errorMsgText, searchValue, offset, searchResultsContainer, totalItems,
-results, pageSelectorContainer, pageCountContainer, backSelectorButton, fwdSelectorButton, loader;
+results, pageSelectorContainer, pageCountContainer, backSelectorButton, fwdSelectorButton, loader, ipAddress;
 
 const spotifyAPI = new SpotifyWebApi();
 const homeLocation = "/index.html";
 const apiGatewayLocation = "https://qi51a8rg1m.execute-api.us-east-1.amazonaws.com/beta/authtoken";
+const ipAddressFetchLocation = "https://api.ipify.org/?format=json";
 const firebaseConfig = {
-  apiKey: "***REMOVED***",
+  apiKey: "AIzaSyBUPeLhbqws2VRhvYo_PhiTM0WjODCSGcU",
   authDomain: "wusbrequests.firebaseapp.com",
   projectId: "wusbrequests",
   storageBucket: "wusbrequests.appspot.com",
@@ -49,6 +50,7 @@ async function init(){
 
   searchBar.value = searchValue;
 
+  ipAddress = await fetchIPAddress();
   await authorizeSpotifyAPI();
   results = await executeSpotifySearch();
   if(results){
@@ -82,19 +84,15 @@ function verifyParams(){
 async function authorizeSpotifyAPI(){
   let tokenCookie = decodeURIComponent(document.cookie).split(";").find(cookie => cookie.includes("authToken"));
   if(!tokenCookie){
-    const response = await fetch(
-      apiGatewayLocation,
-      {
-        method: 'GET'
+    fetch(apiGatewayLocation, {method: 'GET'}).then((response) => {
+      if(response.ok){
+        return response.json();
       }
-    );
-
-    if(response.ok){
-      const data = await response.json();
+      throw new Error();
+    }).then((data) => {
       if(data.statusCode != 200 || !data.body.access_token){
         loader.style.display = "none";
-        displayErrorMessage("Something went wrong, please refresh the page. If problem persists, please email austin.w.west@stonybrook.edu with"
-        + " the following error: Unable to fetch token from API.");
+        displayErrorMessage("Something went wrong, please refresh the page.");
       }else{
         const authToken = data.body.access_token;
         spotifyAPI.setAccessToken(authToken);
@@ -103,13 +101,34 @@ async function authorizeSpotifyAPI(){
         date.setTime(date.getTime() + (expiryTime));
         document.cookie = "authToken=" + authToken + ";expires=" + date.toUTCString() + ";path=/";
       }
-    }else{
+    }).catch((error) => {
       loader.style.display = "none";
-      displayErrorMessage("Something went wrong, please refresh the page. If problem persists, please email austin.w.west@stonybrook.edu with"
-      + " the following error: Unable to fetch token from API.");
-    }
+      displayErrorMessage("Something went wrong, please refresh the page.");
+    });
   }else{
     spotifyAPI.setAccessToken(tokenCookie.replace("authToken=", ""));
+  }
+}
+
+/**
+* Fetch public IP address of user to be stored in Firebase to view on requests table
+* @return {String} A string representing the users ip address.
+*/
+async function fetchIPAddress(){
+  const response = await fetch(
+    ipAddressFetchLocation,
+    {
+      method: 'GET'
+    }
+  );
+
+  if(response.ok){
+    const data = await response.json();
+    return data.ip;
+  }else{
+    loader.style.display = "none";
+    displayErrorMessage("Something went wrong, please refresh the page.");
+    return;
   }
 }
 
@@ -139,7 +158,8 @@ async function executeSpotifySearch(){
             uri: currentTrack.uri,
             explicit: currentTrack.explicit,
             artists: artistsString,
-            timeStamp: Date.now()
+            timeStamp: Date.now(),
+            ipAddress: ipAddress
           };
           resultMap[currentTrack.uri] = trackDataObject;
         }

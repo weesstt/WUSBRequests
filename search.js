@@ -51,7 +51,7 @@ async function init(){
   searchBar.value = searchValue;
 
   ipAddress = await fetchIPAddress();
-  await authorizeSpotifyAPI();
+  await(authorizeSpotifyAPI());
   results = await executeSpotifySearch();
   if(results){
     loader.style.display = "none";
@@ -84,7 +84,7 @@ function verifyParams(){
 async function authorizeSpotifyAPI(){
   let tokenCookie = decodeURIComponent(document.cookie).split(";").find(cookie => cookie.includes("authToken"));
   if(!tokenCookie){
-    fetch(apiGatewayLocation, {method: 'GET'}).then((response) => {
+    return fetch(apiGatewayLocation, {method: 'GET'}).then((response) => {
       if(response.ok){
         return response.json();
       }
@@ -95,11 +95,11 @@ async function authorizeSpotifyAPI(){
         displayErrorMessage("Something went wrong, please refresh the page.");
       }else{
         const authToken = data.body.access_token;
-        spotifyAPI.setAccessToken(authToken);
         const expiryTime = data.body.expires_in * 1000; //Time period in miliseconds that the token is valid
         const date = new Date();
         date.setTime(date.getTime() + (expiryTime));
         document.cookie = "authToken=" + authToken + ";expires=" + date.toUTCString() + ";path=/";
+        spotifyAPI.setAccessToken(authToken);
       }
     }).catch((error) => {
       loader.style.display = "none";

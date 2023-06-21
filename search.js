@@ -10,6 +10,8 @@ const spotifyAPI = new SpotifyWebApi();
 const homeLocation = "/index.html";
 const apiGatewayLocation = "https://qi51a8rg1m.execute-api.us-east-1.amazonaws.com/beta/authtoken";
 const ipAddressFetchLocation = "https://api.ipify.org/?format=json";
+const youtubeAPILocation = "https://youtube.googleapis.com/youtube/v3/search?part=snippet";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBUPeLhbqws2VRhvYo_PhiTM0WjODCSGcU",
   authDomain: "wusbrequests.firebaseapp.com",
@@ -22,6 +24,7 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const database = getDatabase();
+const musicTopicID = "%2Fm%2F04rlf";
 
 /**
 * Initializes HTML element variables when page loads, as well as populating information for search.
@@ -52,6 +55,7 @@ async function init(){
 
   ipAddress = await fetchIPAddress();
   await(authorizeSpotifyAPI());
+  spotifyAPI.setAccessToken(tempKey);
   results = await executeSpotifySearch();
   if(results){
     loader.style.display = "none";
@@ -120,16 +124,16 @@ async function fetchIPAddress(){
     {
       method: 'GET'
     }
-  );
+  )
+  .then((data) => data.json())
+  .then((user) => {
+    return user.ip;
+  })
+  .catch(() => {
+    return "0.0.0.0";
+  });
 
-  if(response.ok){
-    const data = await response.json();
-    return data.ip;
-  }else{
-    loader.style.display = "none";
-    displayErrorMessage("Something went wrong, please refresh the page.");
-    return;
-  }
+  return response;
 }
 
 /**
@@ -224,6 +228,15 @@ function generateSearchResultElement(obj){
   requestButton.addEventListener('click', requestButtonEvent);
   resultContainer.appendChild(requestButton);
 
+  const loader = document.createElement("div");
+  loader.classList.add("lds-ring-request");
+  loader.id = "requestLoader" + obj.uri;
+  for(let i = 0; i < 4; i++){
+    loader.appendChild(document.createElement("div"));
+  }
+  loader.style.display = "none";
+  resultContainer.appendChild(loader);
+
   return resultContainer;
 }
 
@@ -252,7 +265,7 @@ function displayPageSelectorElement(totalItems){
 * specific uri if it is already in the database, then adds it again so that the timestamp gets updated.
 * @param {Event} event The event that triggered the function.
 */
-function requestButtonEvent(event){
+async function requestButtonEvent(event){
   const requestButton = event.target;
   const uri = requestButton.id;
   const trackObj = results[uri];
@@ -262,6 +275,14 @@ function requestButtonEvent(event){
     return;
   }
 
+  requestButton.style.display = "none";
+  const loader = document.getElementById("requestLoader" + trackObj.uri);
+  loader.style.display = "flex";
+
+  const youtubeID = await getYoutubeID(trackObj);
+
+  trackObj.youtubeLink = youtubeID == null ? "N/A" : "https://www.youtube.com/watch?v=" + youtubeID;
+
   remove(songListRef)
   .then(() => {
     set(songListRef, trackObj)
@@ -269,16 +290,64 @@ function requestButtonEvent(event){
       requestButton.innerText = "Requested"
       requestButton.classList.remove("requestButton");
       requestButton.classList.add("requestedButton");
+      loader.style.display = "none";
+      requestButton.style.display = "block";
     })
     .catch((error) => {
       console.error(error);
       displayErrorMessage();
+      loader.style.display = "none";
+      requestButton.style.display = "block";
+      requestButton.classList.remove("requestButton");
+      requestButton.classList.add("requestedButton");
+      requestButton.innerText = "Error";
     })
   })
   .catch((error) => {
     console.error(error);
     displayErrorMessage();
+    loader.style.display = "none";
+    requestButton.style.display = "block";
+    requestButton.classList.remove("requestButton");
+    requestButton.classList.add("requestedButton");
+    requestButton.innerText = "Error";
   });
+}
+
+/**
+* Function to communicate with the YouTube API to be able to search for a corresponding  
+* audio/lyric video for the specified trackObj
+* @param {Object} trackObj The track object to find a corresponding YouTube source for.
+* @return {String} The YouTube video ID, will be null if there is none found or a problem communicating with API.
+*/
+async function getYoutubeID(trackObj){
+  const trackName = trackObj.songName;
+  const artistsString = trackObj.artistsString;
+  const response = await fetch(
+    youtubeAPILocation + "&q=" + trackObj.songName + " " + trackObj.artists + "&topicId=" + musicTopicID + "&key=" + firebaseConfig.apiKey,
+    {
+      method: 'GET',
+      headers: {
+        "Accept": "application/json"
+      }
+    })
+  .then((data) => data.json())
+  .then((youtubeData) => {
+      let audioID;
+      let lyricID;
+      for(let i = 0; i < youtubeData.items.length; i++){
+        const resultObj = youtubeData.items[i];
+        if(resultObj.snippet.title.toLowerCase().includes("audio")){
+          audioID = resultObj.id.videoId;
+        }else if(resultObj.snippet.title.toLowerCase().includes("lyric")){
+          lyricID = resultObj.id.videoId;
+        }
+      }
+      return audioID != null ? audioID : lyricID;
+  })
+  .catch(() => null);
+
+  return response;
 }
 
 /**

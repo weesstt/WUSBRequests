@@ -55,7 +55,6 @@ async function init(){
 
   ipAddress = await fetchIPAddress();
   await(authorizeSpotifyAPI());
-  spotifyAPI.setAccessToken(tempKey);
   results = await executeSpotifySearch();
   if(results){
     loader.style.display = "none";

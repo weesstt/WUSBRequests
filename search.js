@@ -9,8 +9,8 @@ results, pageSelectorContainer, pageCountContainer, backSelectorButton, fwdSelec
 const spotifyAPI = new SpotifyWebApi();
 const homeLocation = "/index.html";
 const apiGatewayLocation = "https://qi51a8rg1m.execute-api.us-east-1.amazonaws.com/beta/authtoken";
-const ipAddressFetchLocation = "https://api.ipify.org/?format=json";
-const youtubeAPILocation = "https://youtube.googleapis.com/youtube/v3/search?part=snippet";
+const ipAddressFetchLocation = "https://freeipapi.com/api/json";
+const youtubeAPILocation = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=5";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUPeLhbqws2VRhvYo_PhiTM0WjODCSGcU",
@@ -126,7 +126,7 @@ async function fetchIPAddress(){
   )
   .then((data) => data.json())
   .then((user) => {
-    return user.ip;
+    return user.ipAddress;
   })
   .catch(() => {
     return "0.0.0.0";
@@ -321,9 +321,9 @@ async function requestButtonEvent(event){
 */
 async function getYoutubeID(trackObj){
   const trackName = trackObj.songName;
-  const artistsString = trackObj.artistsString;
+  const artistsString = trackObj.artists;
   const response = await fetch(
-    youtubeAPILocation + "&q=" + trackObj.songName + " " + trackObj.artists + "&topicId=" + musicTopicID + "&key=" + firebaseConfig.apiKey,
+    youtubeAPILocation + "&q=" + trackName + " " + artistsString + " audio" + "&topicId=" + musicTopicID + "&key=" + firebaseConfig.apiKey,
     {
       method: 'GET',
       headers: {
@@ -332,20 +332,23 @@ async function getYoutubeID(trackObj){
     })
   .then((data) => data.json())
   .then((youtubeData) => {
-      let audioID;
-      let lyricID;
-      for(let i = 0; i < youtubeData.items.length; i++){
-        const resultObj = youtubeData.items[i];
-        if(resultObj.snippet.title.toLowerCase().includes("audio")){
-          audioID = resultObj.id.videoId;
-        }else if(resultObj.snippet.title.toLowerCase().includes("lyric")){
-          lyricID = resultObj.id.videoId;
-        }
+    let audioID;
+    let lyricID;
+    for(let i = 0; i < youtubeData.items.length; i++){
+      const resultObj = youtubeData.items[i];
+      if(resultObj.snippet.title.toLowerCase().includes("audio")){
+        audioID = resultObj.id.videoId;
+      }else if(resultObj.snippet.title.toLowerCase().includes("lyric")){
+        lyricID = resultObj.id.videoId;
       }
+    }
+    if(audioID != null){
       return audioID != null ? audioID : lyricID;
+    }else{
+      return youtubeData.items[0].id.videoId;
+    }
   })
   .catch(() => null);
-
   return response;
 }
 
